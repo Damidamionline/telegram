@@ -101,28 +101,33 @@ def dashboard():
         return f"Error loading dashboard: {e}"
 
 
-
 @app.route("/upload", methods=["POST"])
-def upload_result():
-    data = request.get_json()
-    if not data:
-        return {"status": "error", "message": "No data provided"}, 400
+def upload():
+    try:
+        data = request.get_json()
 
-    # Append the received data to wingo_results.csv
-    with open("wingo_results.csv", "a", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            data["timestamp"],
-            data["period"],
-            data["number"],
-            data["result"],
-            data["prediction"],
-            data["confidence"],
-            data["status"],
-            data["stage"]
-        ])
+        # Convert timestamp string to string if it's a datetime object
+        if isinstance(data.get("timestamp"), dict):
+            data["timestamp"] = data["timestamp"]["__str__"]
 
-    return {"status": "success"}, 200
+        # Define your CSV path
+        csv_path = os.path.join(os.path.dirname(__file__), "wingo_results.csv")
+
+        # Append new data
+        write_header = not os.path.exists(csv_path)
+        with open(csv_path, "a", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=[
+                "timestamp", "period", "number", "result",
+                "prediction", "confidence", "status", "stage"
+            ])
+            if write_header:
+                writer.writeheader()
+            writer.writerow(data)
+
+        return jsonify({"message": "Uploaded successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 
 @app.route("/api")
