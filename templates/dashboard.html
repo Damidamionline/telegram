@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WinGo Predictor Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+            color: #222;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            min-width: 150px;
+            text-align: center;
+        }
+        .card h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #777;
+        }
+        .win { color: green; }
+        .loss { color: red; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        th {
+            background: #333;
+            color: white;
+        }
+        .green { color: green; }
+        .red { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔮 WinGo Prediction Dashboard</h1>
+
+        <div class="stats">
+            <div class="card">
+                <h2>{{ current_stage }}</h2>
+                <p>Current Stage</p>
+            </div>
+            <div class="card">
+                <h2>{{ highest_stage }}</h2>
+                <p>Highest Stage</p>
+            </div>
+            <div class="card">
+                <h2>{{ accuracy }}%</h2>
+                <p>Prediction Accuracy</p>
+            </div>
+            <div class="card">
+                <h2 class="{{ last_result }}">{{ last_prediction }}</h2>
+                <p>Last Prediction</p>
+            </div>
+        </div>
+
+        <h2>📈 Recent Results</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Period</th>
+                    <th>Number</th>
+                    <th>Actual</th>
+                    <th>Prediction</th>
+                    <th>Stage</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in recent_results %}
+                <tr>
+                    <td>{{ row.timestamp }}</td>
+                    <td>{{ row.period }}</td>
+                    <td>{{ row.number }}</td>
+                    <td>{{ row.actual }}</td>
+                    <td>{{ row.prediction }}</td>
+                    <td>{{ row.stage }}</td>
+                    <td class="{{ row.result|lower }}">{{ row.result }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
