@@ -76,12 +76,13 @@ def dashboard():
                 "timestamp": row["timestamp"],
                 "period": row["period"],
                 "number": row["number"],
-                "result": row["result"],
+                "actual": row["status"],  # <-- rename here
                 "prediction": row["prediction"],
                 "confidence": f"{float(row['confidence']) * 100:.1f}%",
-                "status": row["status"],
-                "stage": row["stage"]
+                "stage": row["stage"],
+                "result": row["result"]
             })
+
 
         metrics = load_metrics()
 
