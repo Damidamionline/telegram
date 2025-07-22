@@ -1,11 +1,11 @@
 {
-    "current_stage": 1,
-    "highest_stage": 5,
-    "correct_predictions": 32,
-    "total_predictions": 46,
-    "last_prediction": "Small",
-    "last_confidence": 0.8571428571428571,
-    "last_result": "Small",
-    "last_timestamp": "2025-07-22 19:31:28",
-    "last_outcome": "\u2705 Win"
+  "current_stage": 1,
+  "highest_stage": 2,
+  "correct_predictions": 3,
+  "total_predictions": 5,
+  "last_prediction": "Big",
+  "last_confidence": 0.5,
+  "last_result": "Small",
+  "last_timestamp": "2025-07-22 19:10:13.354949",
+  "last_outcome": "\u2705 Win"
 }

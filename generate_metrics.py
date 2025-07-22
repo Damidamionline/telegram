@@ -2,12 +2,14 @@ import pandas as pd
 import json
 import os
 
+# Correct path (same folder as the script)
 CSV_FILE = "wingo_results.csv"
 METRICS_FILE = "metrics.json"
 
+
 def generate_metrics():
     if not os.path.exists(CSV_FILE):
-        print("❌ CSV file not found.")
+        print("❌ CSV file not found at", CSV_FILE)
         return
 
     df = pd.read_csv(CSV_FILE)
@@ -28,22 +30,25 @@ def generate_metrics():
         last_outcome = df.iloc[-1]["status"]
 
         metrics = {
-            "current_stage": current_stage,
-            "highest_stage": highest_stage,
-            "correct_predictions": correct_predictions,
-            "total_predictions": total_predictions,
-            "last_prediction": prediction,
-            "last_confidence": confidence,
-            "last_result": actual_result,
-            "last_timestamp": str(timestamp),
-            "last_outcome": status
+            "current_stage": int(current_stage),
+            "highest_stage": int(highest_stage),
+            "correct_predictions": int(correct_predictions),
+            "total_predictions": int(total_predictions),
+            "last_prediction": str(last_prediction),
+            "last_confidence": float(last_confidence),
+            "last_result": str(last_result),
+            "last_timestamp": str(last_timestamp),
+            "last_outcome": str(last_outcome)
         }
 
-        try:
-            with open(os.path.join("wingo-dashboard", "metrics.json"), "w", encoding="utf-8") as f:
-                json.dump(metrics, f, indent=2)
-        except Exception as e:
-            print(f"❌ Failed to save metrics.json: {e}")
+        with open(METRICS_FILE, "w", encoding="utf-8") as f:
+            json.dump(metrics, f, indent=2)
+
+        print("✅ metrics.json saved successfully.")
+
+    except Exception as e:
+        print(f"❌ Failed to save metrics.json: {e}")
+
 
 if __name__ == "__main__":
     generate_metrics()
