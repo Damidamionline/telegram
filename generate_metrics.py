@@ -21,6 +21,8 @@ def generate_metrics():
     try:
         total_predictions = len(df)
         correct_predictions = len(df[df["status"] == "✅ Win"])
+        accuracy = (correct_predictions / total_predictions) * 100
+
         highest_stage = int(df["stage"].max())
         current_stage = int(df.iloc[-1]["stage"])
         last_prediction = str(df.iloc[-1]["prediction"])
@@ -38,7 +40,8 @@ def generate_metrics():
             "last_confidence": last_confidence,
             "last_result": last_result,
             "last_timestamp": last_timestamp,
-            "last_outcome": last_outcome
+            "last_outcome": last_outcome,
+            "accuracy": round(accuracy, 1)
         }
 
         with open(METRICS_FILE, "w", encoding="utf-8") as f:
