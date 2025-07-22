@@ -3,6 +3,7 @@ import pandas as pd
 import json
 import os
 import csv
+from flask import request
 
 
 app = Flask(__name__)
@@ -98,6 +99,30 @@ def dashboard():
         )
     except Exception as e:
         return f"Error loading dashboard: {e}"
+
+
+
+@app.route("/upload", methods=["POST"])
+def upload_result():
+    data = request.get_json()
+    if not data:
+        return {"status": "error", "message": "No data provided"}, 400
+
+    # Append the received data to wingo_results.csv
+    with open("wingo_results.csv", "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            data["timestamp"],
+            data["period"],
+            data["number"],
+            data["result"],
+            data["prediction"],
+            data["confidence"],
+            data["status"],
+            data["stage"]
+        ])
+
+    return {"status": "success"}, 200
 
 
 @app.route("/api")
