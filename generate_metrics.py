@@ -21,24 +21,24 @@ def generate_metrics():
     try:
         total_predictions = len(df)
         correct_predictions = len(df[df["status"] == "✅ Win"])
-        highest_stage = df["stage"].max()
-        current_stage = df.iloc[-1]["stage"]
-        last_prediction = df.iloc[-1]["prediction"]
+        highest_stage = int(df["stage"].max())
+        current_stage = int(df.iloc[-1]["stage"])
+        last_prediction = str(df.iloc[-1]["prediction"])
         last_confidence = float(df.iloc[-1]["confidence"])
-        last_result = df.iloc[-1]["result"]
-        last_timestamp = df.iloc[-1]["timestamp"]
-        last_outcome = df.iloc[-1]["status"]
+        last_result = str(df.iloc[-1]["result"])
+        last_timestamp = str(df.iloc[-1]["timestamp"])
+        last_outcome = str(df.iloc[-1]["status"])
 
         metrics = {
-            "current_stage": int(current_stage),
-            "highest_stage": int(highest_stage),
-            "correct_predictions": int(correct_predictions),
-            "total_predictions": int(total_predictions),
-            "last_prediction": str(last_prediction),
-            "last_confidence": float(last_confidence),
-            "last_result": str(last_result),
-            "last_timestamp": str(last_timestamp),
-            "last_outcome": str(last_outcome)
+            "current_stage": current_stage,
+            "highest_stage": highest_stage,
+            "correct_predictions": correct_predictions,
+            "total_predictions": total_predictions,
+            "last_prediction": last_prediction,
+            "last_confidence": last_confidence,
+            "last_result": last_result,
+            "last_timestamp": last_timestamp,
+            "last_outcome": last_outcome
         }
 
         with open(METRICS_FILE, "w", encoding="utf-8") as f:
