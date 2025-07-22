@@ -1,0 +1,5 @@
+timestamp,period,number,result,prediction,confidence,status,stage
+2025-07-22 17:00:32.844444,20250722100051921,8,Big,Big,1.0,⏳ First prediction,1
+2025-07-22 17:01:02.917686,,,,Big,0.5,❌ Loss,2
+2025-07-22 17:01:32.982168,20250722100051923,8,Big,Big,0.5,✅ Win,1
+2025-07-22 17:02:03.084674,,,,Big,1.0,❌ Loss,2
