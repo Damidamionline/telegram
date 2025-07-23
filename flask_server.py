@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 CSV_FILE = "wingo_results.csv"
 METRICS_FILE = "metrics.json"
-AUTO_BETTING_FILE = os.path.join("wingo_dashboard", "betting_flag.json")
+AUTO_BETTING_FILE = os.path.join("betting_flag.json")
 
 
 def set_betting_flag(status: bool):
@@ -45,8 +45,6 @@ def load_data():
     return []
 
 
-
-
 def get_betting_flag():
     if not os.path.exists(AUTO_BETTING_FILE):
         return False
@@ -59,6 +57,7 @@ def toggle_betting():
     data = request.get_json()
     status = data.get("enabled", False)
     set_betting_flag(status)
+    print(f"🔄 Betting flag set to: {status}")
     return jsonify({"success": True, "enabled": status})
 
 
