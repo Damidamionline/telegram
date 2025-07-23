@@ -1,15 +1,14 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request, send_file
 import pandas as pd
 import json
 import os
 import csv
-from flask import request
-
 
 app = Flask(__name__)
 
 CSV_FILE = "wingo_results.csv"
 METRICS_FILE = "metrics.json"
+AUTO_BETTING_FILE = "betting_flag.json"
 
 
 def load_metrics():
@@ -30,29 +29,6 @@ def load_metrics():
         }
 
 
-def get_current_stage():
-    return load_metrics().get("current_stage", 1)
-
-
-def get_highest_stage():
-    return load_metrics().get("highest_stage", 1)
-
-
-def get_accuracy():
-    metrics = load_metrics()
-    total = metrics.get("total_predictions", 0)
-    correct = metrics.get("correct_predictions", 0)
-    return f"{(correct / total) * 100:.1f}%" if total > 0 else "N/A"
-
-
-def get_last_prediction():
-    return load_metrics().get("last_prediction", "N/A")
-
-
-def get_last_result():
-    return load_metrics().get("last_result", "N/A")
-
-
 def load_data():
     if os.path.exists(CSV_FILE):
         try:
@@ -63,37 +39,67 @@ def load_data():
     return []
 
 
+def set_betting_flag(status: bool):
+    with open(AUTO_BETTING_FILE, "w") as f:
+        json.dump({"enabled": status}, f)
+
+
+def get_betting_flag():
+    if not os.path.exists(AUTO_BETTING_FILE):
+        return False
+    with open(AUTO_BETTING_FILE, "r") as f:
+        return json.load(f).get("enabled", False)
+
+
+@app.route("/toggle-betting", methods=["POST"])
+def toggle_betting():
+    data = request.get_json()
+    status = data.get("enabled", False)
+    set_betting_flag(status)
+    return jsonify({"success": True, "enabled": status})
+
+
+@app.route("/betting-status")
+def betting_status():
+    return jsonify({"enabled": get_betting_flag()})
+
+
 @app.route("/")
 def dashboard():
     try:
-        with open("wingo_results.csv", encoding="utf-8", errors="ignore") as f:
+        with open(CSV_FILE, encoding="utf-8", errors="ignore") as f:
             reader = list(csv.DictReader(f))
             recent = reader[-10:] if len(reader) >= 10 else reader
 
         recent_results = []
         for row in recent:
+            try:
+                confidence = f"{float(row.get('confidence', 0)) * 100:.1f}%"
+            except:
+                confidence = "0.0%"
+
             recent_results.append({
-                "timestamp": row["timestamp"],
-                "period": row["period"],
-                "number": row["number"],
-                "actual": row["status"],  # <-- rename here
-                "prediction": row["prediction"],
-                "confidence": f"{float(row['confidence']) * 100:.1f}%",
-                "stage": row["stage"],
-                "result": row["result"]
+                "timestamp": row.get("timestamp", "N/A"),
+                "period": row.get("period", "N/A"),
+                "number": row.get("number", "N/A"),
+                "actual": row.get("status", "N/A"),
+                "prediction": row.get("prediction", "N/A"),
+                "confidence": confidence,
+                "stage": row.get("stage", "N/A"),
+                "result": row.get("result", "N/A")
             })
 
-
         metrics = load_metrics()
+        accuracy = (
+            f"{(metrics['correct_predictions'] / metrics['total_predictions'] * 100):.1f}%"
+            if metrics["total_predictions"] else "N/A"
+        )
 
         return render_template(
             "dashboard.html",
             current_stage=metrics["current_stage"],
             highest_stage=metrics["highest_stage"],
-            accuracy=(
-                f"{(metrics['correct_predictions'] / metrics['total_predictions'] * 100):.1f}%"
-                if metrics["total_predictions"] else "N/A"
-            ),
+            accuracy=accuracy,
             last_prediction=metrics["last_prediction"],
             last_result=metrics["last_result"],
             recent_results=recent_results
@@ -109,14 +115,11 @@ def upload():
 
         # Convert timestamp string to string if it's a datetime object
         if isinstance(data.get("timestamp"), dict):
-            data["timestamp"] = data["timestamp"]["__str__"]
+            data["timestamp"] = data["timestamp"].get(
+                "__str__", str(data["timestamp"]))
 
-        # Define your CSV path
-        csv_path = os.path.join(os.path.dirname(__file__), "wingo_results.csv")
-
-        # Append new data
-        write_header = not os.path.exists(csv_path)
-        with open(csv_path, "a", newline="", encoding="utf-8") as f:
+        write_header = not os.path.exists(CSV_FILE)
+        with open(CSV_FILE, "a", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=[
                 "timestamp", "period", "number", "result",
                 "prediction", "confidence", "status", "stage"
@@ -129,6 +132,19 @@ def upload():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+@app.route("/upload-metrics", methods=["POST"])
+def receive_metrics():
+    data = request.json
+    with open(METRICS_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+    return jsonify({"status": "success"}), 200
+
+
+@app.route("/metrics")
+def metrics():
+    return send_file(METRICS_FILE, mimetype="application/json")
 
 
 @app.route("/api")

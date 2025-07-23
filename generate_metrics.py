@@ -1,10 +1,12 @@
 import pandas as pd
 import json
 import os
+import requests
 
-# Correct path (same folder as the script)
-CSV_FILE = "wingo_results.csv"
-METRICS_FILE = "metrics.json"
+
+BASE_DIR = os.path.dirname(__file__)
+CSV_FILE = os.path.join(BASE_DIR, "wingo_results.csv")
+METRICS_FILE = os.path.join(BASE_DIR, "metrics.json")
 
 
 def generate_metrics():
@@ -51,6 +53,9 @@ def generate_metrics():
 
     except Exception as e:
         print(f"❌ Failed to save metrics.json: {e}")
+        
+    
+
 
 
 if __name__ == "__main__":
