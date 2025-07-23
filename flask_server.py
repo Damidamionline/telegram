@@ -8,7 +8,13 @@ app = Flask(__name__)
 
 CSV_FILE = "wingo_results.csv"
 METRICS_FILE = "metrics.json"
-AUTO_BETTING_FILE = os.path.join("betting_flag.json")
+AUTO_BETTING_FILE = os.path.join("wingo_dashboard", "betting_flag.json")
+
+
+def set_betting_flag(status: bool):
+    os.makedirs("wingo_dashboard", exist_ok=True)  # ✅ ensure folder exists
+    with open(AUTO_BETTING_FILE, "w") as f:
+        json.dump({"enabled": status}, f)
 
 
 def load_metrics():
@@ -39,9 +45,6 @@ def load_data():
     return []
 
 
-def set_betting_flag(status: bool):
-    with open(AUTO_BETTING_FILE, "w") as f:
-        json.dump({"enabled": status}, f)
 
 
 def get_betting_flag():
