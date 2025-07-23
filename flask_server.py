@@ -86,7 +86,8 @@ def dashboard():
                 "prediction": row.get("prediction", "N/A"),
                 "confidence": confidence,
                 "stage": row.get("stage", "N/A"),
-                "result": row.get("result", "N/A")
+                "result": row.get("result", "N/A"),
+                "status": row["status"]
             })
 
         metrics = load_metrics()
