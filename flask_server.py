@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 CSV_FILE = "wingo_results.csv"
 METRICS_FILE = "metrics.json"
-AUTO_BETTING_FILE = os.path.join("wingo_dashboard", "betting_flag.json")
+AUTO_BETTING_FILE = os.path.join("betting_flag.json")
 
 
 def load_metrics():
